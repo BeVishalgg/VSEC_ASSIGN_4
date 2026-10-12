@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Result Management System</title>
+    <style>
+        /* Basic reset for clean layout */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f4f7f6;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        /* Form Styling */
+        form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #2c3e50;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Topper Section Styling */
+        .topper-section {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #c3e6cb;
+            text-align: center;
+            display: none; /* Hidden by default until data is added */
+        }
+        
+        .topper-section h3 {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Student Result Management</h1>
+
+        <!-- Form to accept student details -->
+        <form id="studentForm">
+            <div class="form-group">
+                <label for="studentName">Student Name:</label>
+                <input type="text" id="studentName" required placeholder="Enter name">
+            </div>
+            <div class="form-group">
+                <label for="rollNo">Roll Number:</label>
+                <input type="number" id="rollNo" required placeholder="Enter roll no">
+            </div>
+            <div class="form-group">
+                <label for="mathMarks">Math Marks (out of 100):</label>
+                <input type="number" id="mathMarks" required min="0" max="100">
+            </div>
+            <div class="form-group">
+                <label for="sciMarks">Scie (out of 100):</label>
+                <input type="number" id="sciMarks" required min="0" max="100">
+            </div>
+            <div class="form-group">
+                <label for="engMarks">English Marks (out of 100):</label>
+                <input type="number" id="engMarks" required min="0" max="100">
+            </div>
+            <div class="form-group full-width">
+                <button type="submit">Add Student Record</button>
+            </div>
+        </form>
+
+        <!-- Table to display student records -->
+        <h2>Student Records</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Roll No</th>
+                    <th>Name</th>
+                    <th>Math</th>
+                    <th>Physics</th>
+                    <th>Chemistry</th>
+                    <th>Total</th>
+                    <th>Percentage</th>
+                </tr>
+            </thead>
+            <tbody id="studentTableBody">
+                <!-- Rows will be added dynamically by JavaScript -->
+            </tbody>
+        </table>
+
+        <!-- Section to display the class topper -->
+        <div class="topper-section" id="topperSection">
+            <h3>🏆 Class Topper 🏆</h3>
+            <p id="topperDetails">No data yet.</p>
+        </div>
+    </div>
+
+    <script>
+        // Array to store all student records
+        let studentsList = [];
+
+        // Get references to HTML elements
+        const studentForm = document.getElementById('studentForm');
+        const tableBody = document.getElementById('studentTableBody');
+        const topperSection = document.getElementById('topperSection');
+        const topperDetails = document.getElementById('topperDetails');
+
+        // Listen for the form submission
+        studentForm.addEventListener('submit', function(event) {
+            // Prevent the page from reloading when the form is submitted
+            event.preventDefault();
+
+            // 1. Get values from the input fields
+            const name = document.getElementById('studentName').value;
+            const roll = document.getElementById('rollNo').value;
+            // Convert marks to numbers using parseFloat
+            const math = parseFloat(document.getElementById('mathMarks').value);
+            const science = parseFloat(document.getElementById('sciMarks').value);
+            const english = parseFloat(document.getElementById('engMarks').value);
+
+            // 2. Calculate Total and Percentage
+            const totalMarks = math + science + english;
+            const percentage = (totalMarks / 300) * 100;
+
+            // 3. Create a student object
+            const studentObject = {
+                name: name,
+                roll: roll,
+                math: math,
+                science: science,
+                english: english,
+                total: totalMarks,
+                percentage: percentage.toFixed(2) // keep 2 decimal places
+            };
+
+            // 4. Add the new student to our array
+            studentsList.push(studentObject);
+
+            // 5. Update the UI
+            updateTable();
+            findAndDisplayTopper();
+
+            // Clear the form fields for the next entry
+            studentForm.reset();
+        });
+
+        // Function to dynamically update the HTML table
+        function updateTable() {
+            // Clear the existing rows in the table body
+            tableBody.innerHTML = '';
+
+            // Loop through our array of students
+            for (let i = 0; i < studentsList.length; i++) {
+                let student = studentsList[i];
+                
+                // Create a new row (tr element)
+                let row = document.createElement('tr');
+
+                // Fill the row with standard HTML cells (td)
+                row.innerHTML = `
+                    <td>${student.roll}</td>
+                    <td>${student.name}</td>
+                    <td>${student.math}</td>
+                    <td>${student.science}</td>
+                    <td>${student.english}</td>
+                    <td><strong>${student.total}</strong></td>
+                    <td><strong>${student.percentage}%</strong></td>
+                `;
+
+                // Append the row to the table body
+                tableBody.appendChild(row);
+            }
+        }
+
+        // Function to find the student with the highest percentage
+        function findAndDisplayTopper() {
+            // If there are no students, do nothing
+            if (studentsList.length === 0) return;
+
+            let currentTopper = studentsList[0];
+
+            // Loop through students to find the highest percentage
+            for (let i = 1; i < studentsList.length; i++) {
+                if (parseFloat(studentsList[i].percentage) > parseFloat(currentTopper.percentage)) {
+                    currentTopper = studentsList[i];
+                }
+            }
+
+            // Make the topper section visible
+            topperSection.style.display = 'block';
+
+            // Update the text to show the topper's details
+            topperDetails.innerHTML = `${currentTopper.name} (Roll No: ${currentTopper.roll}) with <strong>${currentTopper.percentage}%</strong>`;
+        }
+    </script>
+</body>
+</html>
